@@ -8,7 +8,7 @@ new p5();
 const circleRange = random.range(1, 20);
 const noiseCoords = [];
 const getNoiseCoords = () => {};
-for (let i = 0; i < 300; i++) {
+for (let i = 0; i < 100; i++) {
   const xVal = random.range(-270, 270);
   const yVal = random.range(-700, 300);
   noiseCoords.push({ x: xVal, y: yVal });
@@ -22,6 +22,7 @@ const settings = {
   p5: true,
   // Turn on a render loop (it's off by default in canvas-sketch)
   animate: true,
+  fps: 24,
   // We can specify WebGL context if we want
   context: "webgl",
   // Optional loop duration
@@ -30,7 +31,7 @@ const settings = {
   attributes: {
     antialias: true
   },
-  dimensions: "A4"
+  dimensions: [595, 842]
 };
 
 // Optionally preload before you load the sketch
