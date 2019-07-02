@@ -13,7 +13,7 @@ new p5();
 const circleRange = random.range(1, 20);
 const noiseCoords = [];
 const getNoiseCoords = () => {};
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 200; i++) {
   const xVal = random.range(-270, 270);
   const yVal = random.range(-700, 300);
   noiseCoords.push({ x: xVal, y: yVal });
@@ -145,6 +145,62 @@ canvasSketch(() => {
       }
     };
 
+    function drawRose(coords, size, gold, lens, heavy, black) {
+      // if not coords within xmax and xmin and y min and max
+
+      function reduceDenominator(num, den) {
+        function rec(a, b) {
+          return b ? rec(a, a % b) : a;
+        }
+        return den / rec(num, den);
+      }
+      xmax = 100;
+      xmin = -100;
+      ymax = 350;
+      ymin = 0;
+
+      let x1 = coords[0];
+      let y1 = coords[1];
+
+      let flag;
+      if (x1 > -100 && x1 < 100 && y1 > -350 && y1 < 0 && !gold && !lens) {
+        flag = false;
+      } else {
+        flag = true;
+      }
+
+      if (flag === true) {
+        let d = 80;
+        let n = 100;
+        let k = d / n;
+        let col = gold ? "#d4c557" : "red";
+        if (black) {
+          col = "black";
+        }
+        push();
+        translate(x1, y1);
+        beginShape();
+        stroke(col);
+        noFill();
+        let weight = heavy ? 3 : 2;
+        strokeWeight(weight);
+        for (
+          let a = 0;
+          a < Math.PI * random.range(60, 100) * reduceDenominator(n, d);
+          a += 0.02
+        ) {
+          let r = size * Math.cos(k * a);
+          let x = r * Math.cos(a);
+          let y = r * Math.sin(a);
+          vertex(x, y);
+        }
+        endShape(CLOSE);
+
+        pop();
+        noLoop();
+      }
+    }
+
     const drawNoiseTargets = function(animate, speed, sidesOnly) {
       const getStatic = function() {
         let topLeft = noiseCoords.filter(d => d.x < -100 && d.y < -350);
@@ -171,13 +227,17 @@ canvasSketch(() => {
         coords = getStatic();
       }
 
-      coords.forEach(obj => {
+      coords.forEach((obj, i) => {
         // target function takese 3 arguments
         //x and y values Numbers required
         //animated  boolean flag wheather to animate
         //speed number to interate translateY
         let translateSpeed = speed;
-        target(obj.x, obj.y, animated, translateSpeed);
+        if (i % 10 === 0) {
+          drawRose([obj.x, obj.y], random.range(5, 25));
+        } else {
+          target(obj.x, obj.y, animated, translateSpeed);
+        }
       });
     };
 
@@ -192,29 +252,44 @@ canvasSketch(() => {
       fill(220, 200, 80);
       text("not", 200, 180);
       fill(200, 190, 100);
-      rotate(0.1);
-      text("Bob Dylan", 90, 300);
+      rotate(0.6);
+      text("Bob", -20, 280);
+      fill(150, 170, 80);
+      rotate(-1.2);
+      text("Dylan", -100, 300);
       pop();
       fill("red");
     };
 
     const leftLens = () => {
       push();
-      fill("black");
-      beginShape();
-      vertex(-100, -110);
-      vertex(-20, -110);
-      vertex(-20, -60);
-      vertex(-100, -60);
-      endShape(CLOSE);
-      pop();
+      noFill();
+      arc(-80, -65, -40, -100, PI + QUARTER_PI, TWO_PI);
+
+      fill("red");
+      textSize(23);
+      textAlign(CENTER);
+      //drawRose([-80, -100], 10, false, true);
+
+      let i = 0;
+      let space = 0;
+      let pos = [-55, -100];
+      drawRose([-80, -70], 5, false, true);
+
+      text("|", pos[0], pos[1]);
+      let word = "BLOWING";
+      text(word, pos[0] - 10, pos[1]);
+      text("in the", pos[0], pos[1] + 15);
+      text(" wind", pos[0], pos[1] + 30);
     };
 
     const rightLens = () => {
       push();
+      textSize(20);
       fill("#2f2f2f");
 
       ellipse(63, -89, 80, 50);
+
       rotate(-1);
       pop();
     };
@@ -222,6 +297,17 @@ canvasSketch(() => {
     const glasses = () => {
       leftLens();
       rightLens();
+    };
+
+    const drawFilter = () => {
+      push();
+      // stroke("white");
+      // strokeWeight(2);
+      //fill(200, 180, 10);
+      fill("rgba(57%, 50%, 10%, .33)");
+
+      rect(-(width / 2), -(height / 2), width, height);
+      pop();
     };
 
     // creates the pattern on the face
@@ -243,7 +329,7 @@ canvasSketch(() => {
           fill(col);
 
           rotate(0.1);
-          ellipse(startX, startY - i * 20, 1 + i * 0.1, 3 + i * 0.4);
+          ellipse(startX, startY - i * 20, 2 + i * 0.1, 4 + i * 0.4);
           pop();
 
           push();
@@ -297,9 +383,18 @@ canvasSketch(() => {
 
     glasses();
 
-    drawText();
     //console.log("width and height are", width, height);
     //add static noise that does not animate
     drawNoiseTargets(false, 0, false);
+
+    drawText();
+    drawRose([0, -250], 58, false, true, true, true);
+    drawRose([0, -250], 60, false, true, true);
+    drawRose([0, -250], 40, true);
+    drawRose([0, -250], 17, false, true, true, true);
+    drawRose([0, -250], 20, false, true, true);
+
+    target(0, -250, false, 0);
+    drawFilter();
   };
 }, settings);
